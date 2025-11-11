@@ -1,4 +1,3 @@
-
 // Navegação e controle de fragments
 const slides = [];
 let idx = 0;
