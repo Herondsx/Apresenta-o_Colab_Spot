@@ -1,1 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Métodos Numéricos — Regressões (Python/Colab) • FEI</title>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- CAPA -->
+  <section class="slide active">
+    <h1 class="title type">Métodos Numéricos — Regressões com Python (Colab)</h1>
+    <p class="muted">Trabalho prático — Regressão Linear Simples e Múltipla com <span class="pill">statsmodels</span> & <span class="pill">pandas</span></p>
+    <div class="twocol mt-14">
+      <div class="left card">
+        <h3>Objetivo do trabalho</h3>
+        <ul>
+          <li class="fragment">(a) 5 regressões simples (Y~X) com gráfico, <em>r</em> (Pearson) e R².</li>
+          <li class="fragment">(b) Regressão múltipla (≥ 4 X) via <code>sm.ols</code>, R², coeficientes e p-valores; eliminar a variável menos significativa.</li>
+          <li class="fragment">Resultados salvos em <code>/content/out</code> para montar os slides finais.</li>
+        </ul>
+        <p class="badge">Dataset escolhido: <strong>spotify-2023.csv</strong></p>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">VS Code — presentation.py</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-intro')">copiar</button>
+          <pre><ol class="codelines" id="code-intro"></ol></pre>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span><strong>Autores:</strong> Heron de Souza • Matheus Concon de Oliveira • João Mateus E. B. da Silva</span>
+      <span>FEI — Azul: #006EAA • Cinza: #7B7C7E • Cobalto: #243574</span>
+    </div>
+  </section>
+
+  <!-- 1. Dados & Preparo -->
+  <section class="slide">
+    <h2>Dados & preparo</h2>
+    <div class="twocol">
+      <div class="left card">
+        <h3>Passos</h3>
+        <ul>
+          <li class="fragment" data-hl="#code-data:1-8">Upload do <code>spotify-2023.csv</code> (ou defina <code>FILE_PATH</code>).</li>
+          <li class="fragment" data-hl="#code-data:9-17">Leitura robusta com encodings alternativos.</li>
+          <li class="fragment" data-hl="#code-data:18-26">Filtro para apenas colunas numéricas e remoção de NAs.</li>
+        </ul>
+        <div class="note fragment"><strong>Por quê?</strong> OLS requer variáveis numéricas e não lida com <em>NaN</em> — por isso limpamos antes.</div>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">data_preparo.py</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-data')">copiar</button>
+          <pre><ol class="codelines" id="code-data"></ol></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Exercício (a): seleção de pares -->
+  <section class="slide">
+    <h2>Exercício (a) — Seleção dos 5 pares (Y,X)</h2>
+    <div class="twocol">
+      <div class="left card">
+        <h3>Critério</h3>
+        <ul>
+          <li class="fragment" data-hl="#code-pairs:1-6">Matriz de correlação |r| entre colunas numéricas.</li>
+          <li class="fragment" data-hl="#code-pairs:7-20">Lista (Y,X,|r|) ordenada descendentemente.</li>
+          <li class="fragment" data-hl="#code-pairs:21-34">Escolha de 5 pares com Y <strong>exclusivos</strong> e sem pares espelhados.</li>
+        </ul>
+        <p class="muted fragment">Saída: <code>[{"y":..., "x":...}, ...]</code>.</p>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">pick_top_simple_pairs_uniqueY()</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-pairs')">copiar</button>
+          <pre><ol class="codelines" id="code-pairs"></ol></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Exercício (a): regressão simples -->
+  <section class="slide">
+    <h2>Exercício (a) — Regressão simples Y ~ X</h2>
+    <div class="twocol">
+      <div class="left card">
+        <h3>Etapas</h3>
+        <ul>
+          <li class="fragment" data-hl="#code-simple:1-7">Correlação de Pearson (<code>r</code> e p-valor).</li>
+          <li class="fragment" data-hl="#code-simple:8-17">OLS: β₀ (intercepto), β₁ (inclinação), R² e p(β₁).</li>
+          <li class="fragment" data-hl="#code-simple:18-34">Gráfico: dispersão + reta; anotação com r, R² e p(β₁).</li>
+        </ul>
+        <div class="note fragment"><strong>Interpretação:</strong> <em>r</em> quantifica a força/direção; <em>R²</em> é a fração de variância explicada.</div>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">simple_regression_and_plot()</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-simple')">copiar</button>
+          <pre><ol class="codelines" id="code-simple"></ol></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Exercício (b): escolha de Y e Xs -->
+  <section class="slide">
+    <h2>Exercício (b) — Escolha de Y e ≥4 X</h2>
+    <div class="twocol">
+      <div class="left card">
+        <h3>Heurística</h3>
+        <ul>
+          <li class="fragment" data-hl="#code-choose:1-5">Y = coluna com maior média de |corr| vs. demais.</li>
+          <li class="fragment" data-hl="#code-choose:6-10">Xs = top-4 mais correlacionadas (sem reutilizar Y).</li>
+          <li class="fragment" data-hl="#code-formula:1-10">Fórmula segura para <code>smf.ols</code> com nomes sanitizados.</li>
+        </ul>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">choose_y_and_xs() • fórmula OLS</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-choose')">copiar</button>
+          <pre><ol class="codelines" id="code-choose"></ol></pre>
+          <button class="copybtn" style="top:44px" onclick="copyBlock('code-formula')">copiar</button>
+          <pre><ol class="codelines" id="code-formula"></ol></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Exercício (b): backward elimination -->
+  <section class="slide">
+    <h2>Exercício (b) — Backward elimination (p-valor)</h2>
+    <div class="twocol">
+      <div class="left card">
+        <h3>Algoritmo</h3>
+        <ul>
+          <li class="fragment" data-hl="#code-back:1-7">Identifica a pior variável (maior p, exceto Intercept).</li>
+          <li class="fragment" data-hl="#code-back:8-16">Se p &gt; α: remove, refaz OLS e registra R².</li>
+          <li class="fragment" data-hl="#code-back:17-23">Para quando todas as X remanescentes têm p ≤ α.</li>
+        </ul>
+        <p class="badge fragment">Relatórios salvos: <code>multiple_backelim_steps.csv</code>, coeficientes inicial/final.</p>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">loop de eliminação por p-valor</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-back')">copiar</button>
+          <pre><ol class="codelines" id="code-back"></ol></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. VIF & Diagnósticos -->
+  <section class="slide">
+    <h2>VIF & diagnósticos de resíduos</h2>
+    <div class="twocol">
+      <div class="left card">
+        <h3>Leituras essenciais</h3>
+        <ul>
+          <li class="fragment" data-hl="#code-vif:1-12">VIF &gt; 5–10 sugere multicolinearidade relevante.</li>
+          <li class="fragment" data-hl="#code-diag:1-13">Resíduos vs. Preditos: deve se parecer com ruído (padrão = problema).</li>
+          <li class="fragment" data-hl="#code-diag:14-24">QQ-plot: resíduos próximos da linha 45° (aprox. normalidade).</li>
+        </ul>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">vif() • plots de diagnóstico</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-vif')">copiar</button>
+          <pre><ol class="codelines" id="code-vif"></ol></pre>
+          <button class="copybtn" style="top:44px" onclick="copyBlock('code-diag')">copiar</button>
+          <pre><ol class="codelines" id="code-diag"></ol></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Como rodar no Colab -->
+  <section class="slide">
+    <h2>Como rodar no Colab</h2>
+    <div class="twocol">
+      <div class="left card">
+        <ol>
+          <li class="fragment">Abra um notebook e crie <strong>1 célula</strong>.</li>
+          <li class="fragment">Cole o <strong>código completo</strong> (célula única já funcional).</li>
+          <li class="fragment" data-hl="#code-run:1-5">Defina <code>FILE_PATH = "/content/spotify-2023.csv"</code> ou deixe <code>None</code> para upload.</li>
+          <li class="fragment" data-hl="#code-run:6-15">Execute; observe os blocos <span style="color:var(--accent)">EXERCÍCIO (a)</span> e <span style="color:var(--fei-esmeralda)">EXERCÍCIO (b)</span>.</li>
+          <li class="fragment">Baixe os arquivos em <code>/content/out</code> para usar nos slides finais.</li>
+        </ol>
+      </div>
+      <div class="right ide">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><div class="titlebar">rodar_no_colab.py</div></div>
+        <div class="codewrap">
+          <button class="copybtn" onclick="copyBlock('code-run')">copiar</button>
+          <pre><ol class="codelines" id="code-run"></ol></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Encerramento -->
+  <section class="slide">
+    <h2>Pronto para executar 🚀</h2>
+    <p class="card"><strong>Checklist:</strong> (1) Colab aberto • (2) CSV <em>spotify-2023.csv</em> presente • (3) Célula única colada • (4) Executar e revisar gráficos/tabelas • (5) Exportar do diretório <code>out/</code>.</p>
+    <p class="muted">Dica: você pode editar <code>Y_COL</code> e <code>X_COLS</code> para controlar o modelo múltiplo.</p>
+    <div class="footer"><span><strong>Autores:</strong> Heron de Souza • Matheus Concon de Oliveira • João Mateus E. B. da Silva</span><span>Centro Universitário FEI</span></div>
+  </section>
+
+</div>
+
+<div class="btns">
+  <button onclick="prev()">⬅️ Anterior</button>
+  <button onclick="next()">➡️ Próximo</button>
+</div>
+<div class="slidecount" id="count"></div>
+<div class="slidecount" id="selftest" style="top:28px; right:16px"></div>
+<div class="progress"><i id="prog"></i></div>
+
+<!-- Snippets (JSON válido com \n escapado) -->
+<script id="raw-code" type="application/json">
+{
+  "code-intro": "# Parâmetros e dataset escolhido\nALPHA = 0.05  # nível de significância\nN_SIMPLE = 5  # regressões simples exigidas\nOUT_DIR = '/content/out'\nFILE_PATH = '/content/spotify-2023.csv'  # ou use upload automático\n\n# Libs principais\nimport pandas as pd, numpy as np\nimport statsmodels.api as sm\nimport statsmodels.formula.api as smf\nfrom scipy.stats import pearsonr",
+  "code-data": "from google.colab import files\n# 1) Upload quando FILE_PATH=None\n# up = files.upload(); FILE_PATH = list(up.keys())[0]\n\n# 2) Leitura robusta\ndef load_csv(p):\n    for enc in ('utf-8','latin-1','cp1252'):\n        try: return pd.read_csv(p, encoding=enc)\n        except Exception: pass\n    return pd.read_csv(p)\n\n# 3) Limpeza: manter só numéricas e dropar NAs\ndef numeric_only(df):\n    return df.select_dtypes(include=[np.number]).dropna(how='any')\n\ndf_raw = load_csv(FILE_PATH)\ndf_num = numeric_only(df_raw)",
+  "code-pairs": "def pick_top_simple_pairs_uniqueY(df, n_pairs=5):\n    cols = df.columns.tolist()\n    corr = df.corr(numeric_only=True).abs()\n\n    flat = []\n    for y in cols:\n        for x in cols:\n            if x == y: continue\n            c = corr.loc[y, x]\n            if pd.notna(c):\n                flat.append((y, x, float(c)))\n\n    flat.sort(key=lambda t: t[2], reverse=True)\n\n    pairs, used_y = [], set()\n    for (y, x, c) in flat:\n        if len(pairs) >= n_pairs: break\n        if y in used_y: continue\n        if any({y,x} == {p['y'], p['x']} for p in pairs): continue\n        pairs.append({'y': y, 'x': x})\n        used_y.add(y)\n    return pairs",
+  "code-simple": "def simple_regression_and_plot(df, x_col, y_col):\n    data = df[[x_col, y_col]].dropna().copy()\n\n    # 1) Pearson\n    r, r_p = pearsonr(data[x_col], data[y_col])\n\n    # 2) OLS\n    X = sm.add_constant(data[x_col])\n    y = data[y_col]\n    model = sm.OLS(y, X).fit()\n\n    r2 = model.rsquared\n    slope = model.params[x_col]\n    intercept = model.params['const']\n    p_beta1 = model.pvalues[x_col]\n\n    # 3) Plot (dispersão + reta)\n    import numpy as np, matplotlib.pyplot as plt\n    fig, ax = plt.subplots(figsize=(6,4))\n    ax.scatter(data[x_col], data[y_col], alpha=0.7)\n    xs = np.linspace(data[x_col].min(), data[x_col].max(), 200)\n    ys = intercept + slope*xs\n    ax.plot(xs, ys, linewidth=2)\n    ax.set_title(f'{y_col} ~ {x_col}')\n    ax.grid(True, linestyle='--', alpha=0.3)\n    plt.show()\n\n    return {'r': r, 'R2': r2, 'p_beta1': p_beta1}",
+  "code-choose": "def choose_y_and_xs(df, k=4):\n    corr = df.corr(numeric_only=True).abs()\n    y = corr.mean().sort_values(ascending=False).index[0]\n    xs = corr[y].drop(labels=[y]).sort_values(ascending=False).index[:k].tolist()\n    return y, xs",
+  "code-formula": "# Sanitizar nomes para fórmula\nimport re\nsanitize = lambda s: ('_'+re.sub(r'\\W','_',s)) if re.match(r'^\\d',s) else re.sub(r'\\W','_',s)\n\nY, Xs = choose_y_and_xs(df_num, k=4)\nY_, Xs_ = sanitize(Y), [sanitize(x) for x in Xs]\n\nd = df_num[[Y]+Xs].dropna().copy()\nd.columns = [Y_] + Xs_\nformula = f'{Y_} ~ ' + ' + '.join(Xs_)\nmodel = smf.ols(formula=formula, data=d).fit()",
+  "code-back": "ALPHA = 0.05\ncurrent_X = Xs_.copy()\ncurrent_formula = formula\ncurrent_model = model\nstep = 0\n\nwhile True:\n    pvals = current_model.pvalues.drop(labels='Intercept', errors='ignore')\n    worst = pvals.idxmax(); worst_p = float(pvals.max())\n    if worst_p <= ALPHA or len(pvals) <= 1: break\n    if worst in current_X: current_X.remove(worst)\n    current_formula = f'{Y_} ~ ' + ' + '.join(current_X)\n    current_model = smf.ols(formula=current_formula, data=d).fit()\n    step += 1\n\n# Resultado final: current_model.summary()",
+  "code-vif": "from statsmodels.stats.outliers_influence import variance_inflation_factor as VIF\n\ndef variance_inflation_factors(X_df):\n    X_ = X_df.copy()\n    for col in ('Intercept','const'):\n        if col in X_: X_ = X_.drop(columns=col)\n    vifs = []\n    for i in range(X_.shape[1]):\n        vifs.append(VIF(X_.values, i))\n    return pd.DataFrame({'feature': X_.columns, 'VIF': vifs})",
+  "code-diag": "# Resíduos vs Predito e QQ-plot\ny_pred = current_model.fittedvalues\nresid  = current_model.resid\n\nfig, ax = plt.subplots(figsize=(6,4))\nax.scatter(y_pred, resid, alpha=0.7)\nax.axhline(0, linestyle='--')\nax.set_xlabel('Predito'); ax.set_ylabel('Resíduo')\nax.set_title('Resíduos vs. Preditos')\nax.grid(True, linestyle='--', alpha=0.3)\nplt.show()\n\nfig = sm.qqplot(resid, line='45', fit=True)\nplt.title('QQ-plot dos resíduos')\nplt.show()",
+  "code-run": "# Para forçar um caminho fixo do CSV no Colab:\nFILE_PATH = '/content/spotify-2023.csv'\n\n# Ou manter como None para abrir seletor de upload:\n# FILE_PATH = None\n\n# Depois é só executar a célula única e acompanhar os cabeçalhos\n# 'EXERCÍCIO (a)' e 'EXERCÍCIO (b)' e os gráficos/tabelas gerados."
+}
+</script>
+
+<!-- Script -->
+<script src="script.js" defer></script>
+</body>
+</html>
