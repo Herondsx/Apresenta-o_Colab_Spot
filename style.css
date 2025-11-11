@@ -1,1 +1,104 @@
 
+:root{
+  /* Paleta FEI (Brand Book 2025) */
+  --fei-azul: #006EAA;
+  --fei-cinza: #7B7C7E;
+  --fei-cobalto: #243574;
+  --fei-esmeralda: #63C1D0;
+
+  /* Tema claro */
+  --bg:#ffffff;
+  --bg-soft:#f8fafc;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --shadow: 0 12px 28px rgba(2, 6, 23, .08);
+
+  /* Acentos */
+  --accent: var(--fei-azul);
+  --accent2: var(--fei-cobalto);
+
+  /* Fallback para navegadores sem color-mix */
+  --accent-soft: #e6f2f9;
+}
+
+/* Progressive enhancement: se color-mix existir, usa a versão dinâmica */
+@supports (background: color-mix(in oklab, white 90%, black)) {
+  :root{ --accent-soft: color-mix(in oklab, var(--accent) 16%, #fff); }
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font: 16px/1.6 Poppins, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica, Arial;
+  color:var(--text); background:var(--bg); overflow:hidden;
+}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline}
+
+.deck{position:relative; width:100%; height:100%}
+.slide{position:absolute; inset:0; display:none; padding:56px 64px; background:linear-gradient(180deg, #fff, #fff 60%, var(--bg-soft));}
+.slide.active{display:block; animation:fadeUp .45s ease both}
+@keyframes fadeUp{from{opacity:.0; transform:translateY(8px)} to{opacity:1; transform:none}}
+.title{font-size:44px; line-height:1.15; margin:0 0 6px; color:var(--accent2)}
+h2{font-size:32px; line-height:1.2; margin:0 0 6px; color:var(--accent2)}
+h3{font-size:18px; color:var(--accent); margin:10px 0 6px; letter-spacing:.2px}
+p{margin:8px 0; max-width:96ch}
+.muted{color:var(--muted)}
+.pill{display:inline-block; padding:6px 12px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-weight:600; letter-spacing:.3px}
+ul{margin:10px 0 0 18px}
+li{margin:6px 0}
+
+/* Layout */
+.twocol{display:grid; grid-template-columns:1.05fr .95fr; gap:28px; align-items:stretch; height:calc(100% - 86px)}
+.left,.right{min-height:220px}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+.note{border-left:4px solid var(--accent); padding:12px 14px; background:#f4faff; border-radius:10px}
+.badge{font-size:13px; color:var(--muted)}
+.footer{position:fixed; bottom:10px; left:64px; right:64px; display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:13px}
+
+/* Buttons */
+.btns{position:fixed; bottom:18px; right:18px; display:flex; gap:8px; z-index:5}
+button{background:#ffffff; border:1px solid var(--border); color:var(--text); padding:9px 12px; border-radius:12px; cursor:pointer; box-shadow:var(--shadow)}
+button:hover{border-color:var(--accent)}
+
+.progress{position:fixed; left:0; right:0; bottom:0; height:4px; background:#e2e8f0}
+.progress > i{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--accent), var(--fei-esmeralda)); transition:width .25s ease}
+
+.slidecount{position:fixed; top:10px; right:16px; font-size:13px; color:var(--muted)}
+
+/* Fragments */
+.fragment{opacity:.08; transform:translateY(6px); transition:all .35s ease}
+.fragment.visible{opacity:1; transform:none}
+
+/* IDE-like code panel */
+.ide{background:var(--bg-soft); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden}
+.ide .bar{display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,#ffffff,#f7fafc)}
+.dot{width:12px; height:12px; border-radius:999px; display:inline-block}
+.dot.r{background:#ef4444} .dot.y{background:#f59e0b} .dot.g{background:#22c55e}
+.titlebar{flex:1; text-align:center; font-size:13px; color:#4b5563}
+.codewrap{position:relative; flex:1; overflow:auto}
+.copybtn{position:absolute; top:8px; right:8px; background:#ffffff; border:1px solid var(--border); padding:6px 8px; border-radius:8px; font-size:12px; cursor:pointer}
+.copybtn:hover{border-color:var(--accent)}
+pre{margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace; font-size:13.5px; line-height:1.55; color:#0f172a; padding:10px 0 14px 0}
+ol.codelines{counter-reset:ln; list-style:none; margin:0; padding:0 0 0 56px}
+ol.codelines li{position:relative; padding-right:16px; white-space:pre; background:#ffffff}
+ol.codelines li::before{counter-increment:ln; content:counter(ln); position:absolute; left:16px; color:#94a3b8}
+.hl{background:linear-gradient(90deg, #dff3ff, #f1f5f9); border-left:3px solid var(--accent)}
+code .kw{color:#0ea5e9}
+code .fn{color:#16a34a}
+code .cm{color:#64748b}
+code .str{color:#7c3aed}
+code .op{color:#dc2626}
+
+.card{background:#ffffff; border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:var(--shadow)}
+.type{display:inline-block; border-right:2px solid var(--accent); white-space:nowrap; overflow:hidden; animation:typing 2.6s steps(32,end), cursor .9s step-end infinite}
+@keyframes typing{from{width:0} to{width:100%}}
+@keyframes cursor{50%{border-color:transparent}}
+
+.mt-14{margin-top:14px}
+
+@media (max-width:1100px){
+  .twocol{grid-template-columns:1fr; height:auto; overflow:auto}
+}
